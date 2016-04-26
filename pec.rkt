@@ -1,6 +1,6 @@
 #lang racket
 
-(define horas (list 9 10 11 12 13 14 15 16 17 18 19))
+(define HORAS (list 9 10 11 12 13 14 15 16 17 18 19))
 
 ;;; ORDENA HORAS
 ;; Ordena las horas de un paciente
@@ -99,6 +99,14 @@
 (define (borraHora hora horas)
     (borra hora horas)
 )
+
+(define (parPosible par horas)
+    (and (libre (list-ref par 0) horas) (libre (list-ref par 1) horas))
+)
+
+(define (borraParHoras par horas)
+    (borraHora (list-ref par 0) (borraHora (list-ref par 1) horas))
+)
 ;;; HORAS
 
 ; (list (list "A" "A" (list 1 2 3 4)) (list "B" "B" (list 1 2 4 5)) (list "C" "C" (list 1 3 5 7)))
@@ -106,3 +114,7 @@
 (define (estructuraPacientes lPacientes)
     (eliminaRepes (pacientesPorPares lPacientes))
 )
+
+; (define (voraz usuarios)
+; 
+; )
