@@ -46,6 +46,8 @@
 
 ;;; TODO ELIMINA PARES -> ELIMINAR DE CLIENTES, NO DE LISTAS
 ;; Elimina todas las repeticiones del elemento x de la lista l
+
+; borra x l -> (remove* (list x) l)
 (define (borra x l)
     (if (= (length l) 0)
         null
@@ -86,6 +88,7 @@
 ;;; ELIMINA PARES
 
 ;;; HORAS
+; libre -> (memq hora horas)
 (define (libre hora horas)
     (if (= (length horas) 0)
         #f
@@ -109,12 +112,45 @@
 )
 ;;; HORAS
 
+
+;;; ORDENAR DE MENOS A MAS HORARIOS
+(define (menosHoras l1 l2)
+    (if (< (length (list-ref l1 2)) (length (list-ref l2 2)))
+        l1
+        l2
+    )
+)
+
+(define (obtenerMenorAux menor pacientes)
+    (if (= (length pacientes) 0)
+        menor
+        (obtenerMenorAux (menosHoras menor (car pacientes)) (cdr pacientes))
+    )
+)
+
+(define (obtenerMenor pacientes)
+    (obtenerMenorAux (car pacientes) (cdr pacientes))
+)
+
+;; Pone primero el elemento indicado y lo concatena a la cola sin ese elemento
+(define (ordenaPrimerElemento cabeza cola)
+    (cons cabeza (ordenaPacientesNHoras (borra cabeza cola)))
+)
+
+(define (ordenaPacientesNHoras pacientes)
+    (if (= (length pacientes) 0)
+        '()
+        (ordenaPrimerElemento (obtenerMenor pacientes) pacientes)
+    )
+)
+;;; ORDENAR DE MENOS A MAS HORARIOS
+
 ; (list (list "A" "A" (list 1 2 3 4)) (list "B" "B" (list 1 2 4 5)) (list "C" "C" (list 1 3 5 7)))
 
 (define (estructuraPacientes lPacientes)
-    (eliminaRepes (pacientesPorPares lPacientes))
+    (eliminaRepes (ordenaPacientesNHoras (pacientesPorPares (ordenaHorasPacientes lPacientes))))
 )
 
 ; (define (voraz usuarios)
-; 
+;
 ; )
