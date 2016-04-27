@@ -147,10 +147,83 @@
 
 ; (list (list "A" "A" (list 1 2 3 4)) (list "B" "B" (list 1 2 4 5)) (list "C" "C" (list 1 3 5 7)))
 
+;;; ANÁLISIS Y RESULTADOS
 (define (estructuraPacientes lPacientes)
-    (eliminaRepes (ordenaPacientesNHoras (pacientesPorPares (ordenaHorasPacientes lPacientes))))
+    ;(eliminaRepes
+        (ordenaPacientesNHoras (pacientesPorPares (ordenaHorasPacientes lPacientes)))
+    ;)
 )
 
-; (define (voraz usuarios)
-;
-; )
+(define (borraParPaciente par paciente)
+    (list (list-ref paciente 0) (list-ref paciente 1) (borra par (list-ref paciente 2)))
+)
+
+ (define (voraz pacientes horas)
+    (if (= (length pacientes) 0)
+        '()
+        (if (= (length (list-ref (car pacientes) 2)) 0)
+            (voraz (cdr pacientes) horas)
+            (if (parPosible (car (list-ref (car pacientes) 2)) horas)
+                (cons (list (list-ref (car pacientes) 0) (list-ref (car pacientes) 1) (car (list-ref (car pacientes) 2))) (voraz (cdr pacientes) (borraParHoras (car (list-ref (car pacientes) 2)) horas)) )
+                (voraz (cons (borraParPaciente (car (list-ref (car pacientes) 2)) (car pacientes)) (cdr pacientes)) horas)
+            )
+        )
+    )
+ )
+;;; ANÁLISIS Y RESULTADOS
+
+;;; INTERFAZ GRÁFICA
+
+(define (masTemprano menor pacientes)
+    (if (= (length pacientes) 0)
+        menor
+        (if (< (list-ref (car pacientes) 2) (list-ref menor 2))
+            (masTemprano (car pacientes) (cdr pacientes))
+            (masTemprano menor (cdr pacientes))
+        )
+    )
+)
+
+(define (ordenaPorHoraAux temprano pacientes)
+    (cons temprano (ordenaPorHora (borra temprano pacientes)))
+)
+
+(define (ordenaPorHora pacientes)
+    (if (= (length pacientes) 0)
+        null
+        (ordenaPorHoraAux (masTemprano (car pacientes) (cdr pacientes)) pacientes)
+    )
+)
+
+(define (horasDePaciente paciente)
+    (if (= (length (list-ref paciente 2)) 0)
+        null
+        (cons (list (list-ref paciente 0) (list-ref paciente 1) (car (list-ref paciente 2)))
+        (horasDePaciente (list (list-ref paciente 0) (list-ref paciente 1) (cdr (list-ref paciente 2)))))
+    )
+)
+(define (pacienteHora pacientes)
+    (if (= (length pacientes) 0)
+        null
+        (append (horasDePaciente (car pacientes)) (pacienteHora (cdr pacientes)))
+    )
+)
+
+(define (ordena listaHoras)
+    (ordenaPorHora (pacienteHora listaHoras))
+)
+
+(define (imprimeResultado listaHoras)
+    (ordenaPorHora (pacienteHora listaHoras))
+)
+;;; INTERFAZ GRÁFICA
+
+
+(define (main listaPacientes)
+    (imprimeResultado (voraz (estructuraPacientes listaPacientes) (list 9 10 11 12 13 14 15 16 17 18)))
+)
+
+;;; CASOS DE PRUEBA
+ (main (list (list "A" "A" (list 9 10 11 12 13)) (list "B" "B" (list 14 12)) (list "C" "C" (list 13 15 17)) (list "D" "D" (list 12 18 15)) (list "E" "E" (list 9 10 13 18 15))))
+ (main (list (list "A" "A" (list 9 10 11 12)) (list "B" "B" (list 9 10 11 12))))
+ (main (list (list "A" "A" (list 9 10 11 12)) (list "B" "B" (list 9 10))))
